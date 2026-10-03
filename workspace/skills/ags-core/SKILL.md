@@ -12,8 +12,13 @@ chạy y nhau trên Windows/macOS/Linux, tự đính token — **không cần cu
 `ags` trần thường KHÔNG có trong PATH → gọi bằng đường dẫn đầy đủ
 (Windows mặc định: `%LOCALAPPDATA%\Programs\AGS\ags.exe`). Xem `TOOLS.md` để biết `$AGS` trên máy này.
 
-## Ba luật nền (không có trong bài nào khác)
+## Bốn luật nền (không có trong bài nào khác)
 
+0. **Chuỗi `#a1b2c` ở đầu lời người dùng là SỐ THỨ TỰ LƯỢT do AGS tự thêm — KHÔNG phải câu hỏi,
+   KHÔNG phải mật mã.** Mỗi lượt được AGS đánh một mã ngắn (thăng + chữ-số) để tra lại sau này.
+   Thấy nó thì BỎ QUA, trả lời phần chữ còn lại; **đừng đi tìm xem mã ấy nghĩa là gì** — một agent
+   đã lùng mất mười mấy phút chỉ vì người dùng gõ "#a1b2c chào bạn" (ghi nhận 2026-09-23). Cần tra
+   lại đúng lượt đó thì mới dùng mã: `ags qa <mã>`.
 1. **Người dùng muốn XEM gì thì bung ra màn hình họ.** "mở ra / cho tao xem / coi / show / preview"
    → `ags view <file>`. Đừng in đường dẫn bảo họ tự mở, đừng `cat` nội dung ra terminal.
 2. **Việc mini-app làm được thì đừng tự viết script.** Xem máy có gì: `ags tools`.
@@ -25,6 +30,8 @@ chạy y nhau trên Windows/macOS/Linux, tự đính token — **không cần cu
 |---|---|---|
 | nhắn agent khác, làm việc nhóm, nhờ máy khác | `ags chat --help` | `ags-multi-agent-chat` |
 | mở file / ảnh / video / show / preview | `ags view <file>` | (skill này) |
+| cần người dùng NHẬP thông tin, dựng form, khảo sát | `ags form <spec.json>` | `ags-form` |
+| duyệt web tự động, ABA, hỏi/nhờ META.ai | `ags aba meta-prompt "<câu hỏi>"` | `ags-browser-automation` |
 | máy làm được gì, có app nào | `ags tools` | (skill này) |
 | gọi mini-app | `ags plugin <id> <action> '<json>'` | (skill này) |
 | hôm trước chốt gì, ghi nhớ, bộ nhớ dự án | `ags mem tim "<...>"` | `ags-memory` |

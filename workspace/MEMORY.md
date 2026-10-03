@@ -9,12 +9,17 @@
 - **Agent nhận việc không được hỏi lại** (không ai bấm) → gom câu hỏi vào log, chốt done kèm danh sách.
 - **Dữ liệu riêng ở lại máy** (giọng clone, lịch sử chat, khoá API).
 
-## Sự kiện & mốc (2026-09)
+## Sự kiện & mốc (2026-09 → 2026-10)
 - 2026-09-16/17: dựng cầu đồng bộ lịch sử AGS → sidebar Claude Desktop bằng hook `Stop` + script quét `.jsonl` (5 bẫy: cp1252, UTC, lọc sai, app chỉ đọc lúc
   khởi động, app xoá thư mục sổ). Chiều ngược lại (Desktop → AGS) không có API sạch — đã chốt bỏ, không điều tra lại.
 - 2026-09-18: dựng lại đồng bộ log thành tiến trình nền bền (Startup folder + supervisor + khoá PID). Lỗi thật đã sửa: `ds:null`, lượt không bao giờ `chot`,
   rò `CLAUDE_CODE_SESSION_ID`, dồn nhiều supervisor. Suýt sập app vì `taskkill ags.exe` — **cấm lặp lại**.
 - Người dùng đã bác cách "hạ cấp im lặng": phải nghe đúng ý ("đừng bắt tôi nhờ thủ công" ≠ "cấm mọi chi phí").
+- 2026-09-21: người dùng giao vai trò DÀI HẠN — agent phải liên tục học hỏi những thứ hay nhất của AGS và cập nhật gói này, không phải việc một lần.
+- 2026-10-03: AGS thêm luật mã lượt `#a1b2c` (số thứ tự lượt tự chèn, bỏ qua — xem `ags-core`) và hai năng lực mới `ags form` (trang nhập liệu) và
+  `ags aba` (ABA/META.ai, lái trình duyệt, quay màn hình) — đã đồng bộ vào `ags-core`, `ags-form`, `ags-browser-automation`.
+- 2026-10-03: viết `TOKEN-OPTIMIZATION.md` gom cơ chế `tokenCutting`/`smartRemind` của affix cộng với nếp "ưu tiên bản rẻ trước bản đắt" lặp lại
+  ở `ags mem`, `ags qa`, cache "KHÔNG ĐỔI", mã lượt — theo yêu cầu "tổng hợp nội dung tối ưu token của AGS".
 
 ## Sự thật cần nhớ
 - AGS = điều phối agent CLI; nó gọi chính CLI (`claude`, …) trên máy → nhật ký agent nằm ở nơi CLI ghi (`~/.claude/projects/…jsonl`).

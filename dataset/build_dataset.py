@@ -18,7 +18,9 @@ SYSTEM = (
     "Gọi `ags` bằng đường dẫn đầy đủ nếu không có trong PATH. Việc nào có skill/bài hướng dẫn thì đọc trước khi làm, đừng đoán. "
     "Thứ người dùng cần xem thì `ags view`. Việc mini-app làm được thì không tự viết script. "
     "Khi làm việc do agent khác giao thì không dùng công cụ hỏi lại — gom câu hỏi vào `ags task`. "
-    "Chưa kiểm chứng thì chưa báo xong. Biến AGS_CONV_ID là mã cuộc chat của bạn."
+    "Chưa kiểm chứng thì chưa báo xong. Biến AGS_CONV_ID là mã cuộc chat của bạn. "
+    "Mã `#a1b2c` ở đầu lời người dùng là số thứ tự lượt do AGS tự thêm — bỏ qua, không phải câu hỏi hay mật mã. "
+    "Luôn ưu tiên bản đã chắt/tóm tắt (snap, cache, kho qa) trước khi đụng tới bản gốc/toàn bộ lịch sử."
 )
 
 _n = 0
@@ -282,6 +284,39 @@ add(ex("ops.plugin", "tôi cài plugin rồi mà lệnh mới vẫn không nhậ
 add(ex("ops.dont_guess", "làm cái gì đó với bot Zalo đi", call("ags api GET '/api/agent-prompt?name=zalo_bot_help'"),
        result("# Zalo Bot — tin nhắn Zalo cá nhân …"),
        say("Tôi vừa đọc bài hướng dẫn `zalo_bot_help` (có sẵn cách làm và các bẫy). Anh muốn: kết nối/quét QR, chọn nhóm trực, đặt rule tự trả lời, hay gửi tin?")))
+
+# ───────────────────────── luật 0: mã số thứ tự lượt (#a1b2c) ─────────────────────────
+add(ex("core.turnid", "#a1b2c chào bạn", say("Chào anh! Có việc gì cần tôi giúp không?")))
+add(ex("core.turnid", "#9f0e1 tổng hợp giúp tôi doanh thu quý 3",
+       say("(mã #9f0e1 ở đầu là số thứ tự lượt do AGS tự thêm — bỏ qua, không phải một phần câu hỏi) Anh cho tôi biết doanh thu quý 3 lấy từ nguồn nào — file, API, hay bảng tính cụ thể?")))
+add(ex("core.turnid", "lúc nãy tôi nói gì ở lượt #7f2ab ấy?", call("ags qa #7f2ab"), result("Hỏi: triển khai báo cáo tháng. Trả lời: đã tạo job scheduler chạy 8h sáng hàng ngày."),
+       say("Ở lượt #7f2ab anh hỏi về triển khai báo cáo tháng — tôi đã tạo job scheduler chạy 8h sáng hàng ngày.")))
+
+# ───────────────────────── tối ưu token — nếp nghĩ chung, không chỉ riêng affix ─────────────────────────
+add(ex("token.philosophy", "AGS tiết kiệm token kiểu gì, có phải chỉ mỗi chuyện prefix/suffix không?",
+       say("Không chỉ vậy. `tokenCutting`/`smartRemind` (affix) là tính năng gọi thẳng tên, nhưng cùng nếp nghĩ đó còn lặp lại ở nhiều chỗ: "
+           "`ags mem tim`/`snap` đưa bản đã chắt trước khi đụng bản ghi gốc, tra lại y nguyên chỉ nhận \"KHÔNG ĐỔI\" thay vì gửi lại cả đoạn, "
+           "`ags qa` lấy lại lượt cũ từ kho đã bóc sẵn thay vì tự cuộn nhật ký, và mã lượt `#a1b2c` để tra thẳng không cần đoán. "
+           "Nếp chung: luôn có bản rẻ trước, đánh dấu cái đã xử lý để khỏi làm lại, đẩy nội dung dài ra màn hình thay vì nhét vào chat.")))
+add(ex("token.dont_gut", "tiết kiệm token đi, cắt luôn phần nhắc luật cho gọn",
+       say("Cắt hẳn thì agent sẽ quên luật giữa chừng — đó là lý do AGS tách hai công tắc: `tokenCutting` giãn tần suất nhắc đầy đủ (mặc định 3 câu một lần), còn `smartRemind` (mặc định bật) vẫn cài một dòng RẤT NGẮN gọi tên luật ở giữa hai lần đó để không quên. Anh muốn tôi bật kiểu này (nhắc tối thiểu, không mất luật) hay thật sự muốn tắt hẳn mọi nhắc nhở?")))
+
+# ───────────────────────── ags-form ─────────────────────────
+add(ex("form", "tôi cần thu thập thông tin đăng ký của 50 người tham gia sự kiện — tên, email, số điện thoại, ăn chay hay không",
+       call("ags form registration.json"), result('{"ok":true,"url_hint":"đã bung trang nhập liệu lên màn hình"}'),
+       say("Đã bung trang đăng ký (tên, email, SĐT, ăn chay — checkbox) lên màn hình. Mỗi người điền và nộp xong, kết quả tự lưu vào `data/forms/<id>.json`; tôi đọc file đó để tổng hợp khi anh cần.")))
+add(ex("form.vs_chat", "hỏi tôi 6 câu để lập hồ sơ khách hàng đi",
+       say("6 câu cùng lúc tôi dựng thành một trang nhập liệu (`ags form`) cho anh điền một lượt, đỡ phải trả lời từng câu một trong chat — anh đồng ý không, hay muốn tôi hỏi trực tiếp ở đây?")))
+
+# ───────────────────────── ags-browser-automation (ABA / META.ai) ─────────────────────────
+add(ex("aba.health", "nhờ Meta vẽ cho tao một con mèo phi hành gia", call("ags aba health"), result('{"addon_connected":false,"thu_muc_addon":"~/ABA-addon"}'),
+       say("Addon trình duyệt của ABA chưa nối nên tôi chưa chạy được. Anh mở `edge://extensions`, bật \"Chế độ nhà phát triển\", chọn \"Tải tiện ích đã giải nén\" rồi trỏ vào thư mục `~/ABA-addon` giúp tôi — nối xong tôi chạy ngay, khỏi cần làm gì thêm.")))
+add(ex("aba.health", "(addon đã nối, tiếp tục) nhờ Meta vẽ cho tao một con mèo phi hành gia", call("ags aba health"), result('{"addon_connected":true}'),
+       call('ags aba meta-prompt "Vẽ một con mèo phi hành gia"'), result('{"ok":true,"image_path":"D:/aba/meo-phi-hanh-gia.png"}'),
+       call("ags view D:/aba/meo-phi-hanh-gia.png"), result("ok"),
+       say("Đã nhờ META.ai vẽ xong, ảnh đang hiện trên màn hình anh.")))
+add(ex("aba.record", "quay lại màn hình lúc tôi demo trang web cho khách xem", call("ags aba video start"), result("ok — đang quay"),
+       say("Đang quay hình tab hiện tại. Nhớ để cửa sổ trình duyệt ở trên cùng trong lúc quay; xong thì bảo tôi `dừng quay` là tôi `ags aba video stop` và đưa file cho anh.")))
 
 
 def main():
