@@ -52,3 +52,21 @@ tình huống bằng cách diễn đạt khác và lấy thêm lượt thật t�
   thật trước khi dùng.
 - Cố ý **không đưa vào**: lịch sử chat thô (`ags_sync_log.md`, `.ags-prompts/`) — có tên, SĐT, tài khoản; `CVS-Insight-Tool/` — dự án khác, không phải
   kiến thức AGS; `ai_trends_research_report.md` — báo cáo tin tức, không phải năng lực agent.
+
+## Đồng bộ hub mỗi ngày (bắt buộc, mỗi OpenClaw tự bật)
+
+Mỗi nhân sự dùng OpenClaw riêng, không chung Gateway → mỗi máy tự đăng ký job dưới đây (chạy 1 lần):
+
+```bash
+openclaw automations create "0 7 * * *" \
+  --name "hub-daily-sync" \
+  --display-name "Đồng bộ Hub skill hàng ngày" \
+  --command "bash /home/node/.openclaw/workspace/opendclaw-training/sync-hub.sh" \
+  --command-cwd "/home/node/.openclaw/workspace" \
+  --timeout-seconds 120 --no-deliver
+```
+
+`sync-hub.sh` tự `git pull` (hoặc `git clone` lần đầu) rồi copy `workspace/skills/*`, `TOOLS.md`, `TOKEN-OPTIMIZATION.md`
+vào workspace OpenClaw của máy đó. Lịch `0 7 * * *` = 14h hàng ngày (giờ VN, UTC+7). Đổi giờ: sửa biểu thức cron.
+
+Kiểm tra job đã chạy: `openclaw automations list` xem `hub-daily-sync`.
